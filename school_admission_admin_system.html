@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Springfield Academy - Admission & Admin Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Navigation Header -->
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('home')">
+                <div class="bg-indigo-700 p-2.5 rounded-xl text-indigo-200">
+                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                </div>
+                <div>
+                    <h1 id="brand-school-title" class="text-xl font-bold tracking-tight">Springfield Academy</h1>
+                    <p class="text-xs text-indigo-300 font-medium">Excellence in Education & Character</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-6">
+                <button onclick="switchView('home')" class="text-indigo-200 hover:text-white transition font-medium text-sm">Home</button>
+                <button onclick="switchView('apply')" class="text-indigo-200 hover:text-white transition font-medium text-sm">Apply Now</button>
+                <button onclick="switchView('track')" class="text-indigo-200 hover:text-white transition font-medium text-sm">Track Admission</button>
+                <button onclick="switchView('notes')" class="text-indigo-200 hover:text-white transition font-medium text-sm flex items-center">
+                    <i class="fa-solid fa-book-open mr-1.5"></i> Study Notes
+                </button>
+                <button onclick="handleAdminNavClick()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-lg text-sm font-semibold transition shadow-sm">
+                    <i class="fa-solid fa-lock mr-1.5 text-xs"></i> Admin Portal
+                </button>
+            </nav>
+            <!-- Mobile Menu Toggle -->
+            <div class="md:hidden">
+                <button onclick="toggleMobileMenu()" class="text-indigo-200 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-indigo-950 px-4 pt-2 pb-4 space-y-2 border-t border-indigo-800">
+            <button onclick="switchView('home'); toggleMobileMenu();" class="block w-full text-left py-2 px-3 rounded hover:bg-indigo-900 text-sm">Home</button>
+            <button onclick="switchView('apply'); toggleMobileMenu();" class="block w-full text-left py-2 px-3 rounded hover:bg-indigo-900 text-sm">Apply Now</button>
+            <button onclick="switchView('track'); toggleMobileMenu();" class="block w-full text-left py-2 px-3 rounded hover:bg-indigo-900 text-sm">Track Admission</button>
+            <button onclick="switchView('notes'); toggleMobileMenu();" class="block w-full text-left py-2 px-3 rounded hover:bg-indigo-900 text-sm">Study Notes</button>
+            <button onclick="handleAdminNavClick(); toggleMobileMenu();" class="block w-full text-left py-2 px-3 rounded bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold">Admin Portal</button>
+        </div>
+    </header>
+
+    <!-- Main Content Wrapper -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. HOME VIEW / LANDING -->
+        <section id="view-home" class="view-section fade-in">
+            <!-- Dynamic Admission Status Notice Banner -->
+            <div id="admission-status-banner" class="mb-8 p-4 rounded-2xl shadow-sm border flex flex-col sm:flex-row items-center justify-between gap-4 transition">
+                <div class="flex items-center space-x-3">
+                    <div id="status-icon-box" class="w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold flex-shrink-0"></div>
+                    <div>
+                        <h3 id="admission-status-title" class="font-bold text-base">Admission Status</h3>
+                        <p id="admission-status-desc" class="text-xs mt-0.5 opacity-90"></p>
+                    </div>
+                </div>
+                <div id="status-action-btn-container" class="flex-shrink-0"></div>
+            </div>
+
+            <!-- Hero Banner with Base64 / URL Image Support -->
+            <div class="relative rounded-3xl overflow-hidden shadow-xl mb-12 bg-gradient-to-br from-indigo-900 via-indigo-800 to-blue-900 text-white">
+                <div class="absolute inset-0 z-0 opacity-40 bg-cover bg-center transition-all duration-700" id="hero-bg-image" style="background-image: url('https://placehold.co/1200x600/1e1b4b/ffffff?text=Springfield+Academy');"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-950/90 via-indigo-900/70 to-transparent z-10"></div>
+                <div class="relative z-20 px-8 py-16 sm:px-16 sm:py-24 max-w-3xl">
+                    <span id="hero-badge" class="bg-indigo-600 text-indigo-100 text-xs font-semibold px-3.5 py-1.5 rounded-full uppercase tracking-wider mb-4 inline-block">Admissions Session</span>
+                    <h2 id="hero-title-text" class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-6 leading-tight">Shape Your Child's Future with Springfield</h2>
+                    <p id="hero-desc-text" class="text-indigo-100 text-base sm:text-lg mb-8 leading-relaxed">Welcome to our premier institution. Apply online for classes 6 through 12, browse curriculum notes, and track your admission progress.</p>
+                    <div class="flex flex-wrap gap-4" id="hero-cta-buttons">
+                        <button onclick="switchView('apply')" class="bg-white text-indigo-900 font-semibold px-6 py-3.5 rounded-xl shadow-lg hover:bg-indigo-50 transition transform hover:-translate-y-0.5">
+                            Start Application <i class="fa-solid fa-arrow-right ml-2 text-sm"></i>
+                        </button>
+                        <button onclick="switchView('notes')" class="bg-indigo-700/60 hover:bg-indigo-700 border border-indigo-500 text-white font-semibold px-6 py-3.5 rounded-xl backdrop-blur transition">
+                            Browse Study Notes
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Education Overview Section -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 sm:p-12 mb-12">
+                <div class="max-w-2xl mx-auto text-center mb-12">
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-3.5 py-1.5 rounded-full">Our Educational Philosophy</span>
+                    <h3 class="text-3xl font-extrabold text-slate-900 mt-3 mb-4">Holistic Learning & Character Development</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed">At Springfield Academy, we combine rigorous academic curricula with practical STEM labs, athletics, arts, and moral values to prepare students for global leadership.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-12 h-12 bg-indigo-100 text-indigo-700 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+                            <i class="fa-solid fa-book-open-reader"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Advanced Curriculum</h4>
+                        <p class="text-slate-600 text-sm">Comprehensive lesson plans in Mathematics, Sciences, Computer Science, and Humanities aligned with top international standards.</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+                            <i class="fa-solid fa-laptop-code"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Digital Classrooms</h4>
+                        <p class="text-slate-600 text-sm">Equipped with smart boards, dedicated computer labs, and online resource libraries accessible 24/7 by students and parents.</p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-xl mb-4 font-bold">
+                            <i class="fa-solid fa-medal"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">Values & Leadership</h4>
+                        <p class="text-slate-600 text-sm">Fostering discipline, teamwork, debate societies, and community outreach programs to shape well-rounded individuals.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Public Notices / Announcements Section -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center">
+                    <i class="fa-solid fa-bullhorn text-indigo-600 mr-2.5"></i> School Notices & Announcements
+                </h3>
+                <div id="public-announcements-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic Announcements -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. STUDENT APPLICATION FORM VIEW -->
+        <section id="view-apply" class="view-section hidden fade-in max-w-3xl mx-auto">
+            <div id="apply-closed-notice" class="hidden bg-rose-50 border border-rose-200 rounded-3xl p-8 text-center mb-6">
+                <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-rose-900 mb-2">Admissions Currently Closed</h3>
+                <p id="apply-closed-msg" class="text-rose-700 text-sm mb-6">We are not accepting new applications at this moment. Please check back later or contact school administration.</p>
+                <button onclick="switchView('home')" class="bg-indigo-900 text-white px-6 py-3 rounded-xl font-semibold text-sm">Return to Home</button>
+            </div>
+
+            <div id="apply-form-container" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="bg-indigo-900 text-white px-8 py-6">
+                    <h2 class="text-2xl font-bold">Student Admission Application</h2>
+                    <p class="text-indigo-200 text-sm mt-1">Fill out student credentials, guardian information, and upload fee payment screenshot.</p>
+                </div>
+                <form id="admission-form" onsubmit="handleFormSubmit(event)" class="p-8 space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Full Student Name *</label>
+                            <input type="text" id="app-name" required placeholder="e.g., Alex Johnson" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Applying For Class *</label>
+                            <select id="app-class" required class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-white">
+                                <option value="">Select Class</option>
+                                <option value="Class 6">Class 6</option>
+                                <option value="Class 7">Class 7</option>
+                                <option value="Class 8">Class 8</option>
+                                <option value="Class 9">Class 9</option>
+                                <option value="Class 10">Class 10</option>
+                                <option value="Class 11">Class 11</option>
+                                <option value="Class 12">Class 12</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Guardian / Parent Name *</label>
+                            <input type="text" id="app-guardian" required placeholder="e.g., Robert Johnson" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Contact Phone Number *</label>
+                            <input type="tel" id="app-contact" required placeholder="e.g., +1 (555) 019-2834" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Email Address *</label>
+                            <input type="email" id="app-email" required placeholder="e.g., parent@example.com" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Payment Transaction ID *</label>
+                            <input type="text" id="app-txn" required placeholder="e.g., TXN983472983" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm font-mono">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Residential Address *</label>
+                        <textarea id="app-address" required rows="2" placeholder="Street address, City, State, Zip" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm"></textarea>
+                    </div>
+
+                    <!-- Payment QR Code & Screenshot Upload Section -->
+                    <div class="bg-indigo-50/60 border border-indigo-200 rounded-2xl p-6 space-y-4">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div>
+                                <h4 class="font-bold text-indigo-900 text-base mb-1 flex items-center">
+                                    <i class="fa-solid fa-qrcode mr-2 text-indigo-600"></i> Admission Application Fee Payment
+                                </h4>
+                                <p class="text-xs text-slate-600 leading-relaxed">Scan the QR code to transfer the admission fee via UPI / Bank transfer. Then upload your transaction screenshot receipt.</p>
+                                <div class="mt-2 text-xs font-semibold text-indigo-800 bg-white inline-block px-3 py-1 rounded-lg border border-indigo-100">
+                                    UPI ID: <span id="display-upi-id" class="font-mono">springfield@upi</span> | Fee: <span id="display-fee-amount">$50</span>
+                                </div>
+                            </div>
+                            <div class="bg-white p-3 rounded-xl shadow-sm border border-indigo-100 text-center flex-shrink-0">
+                                <img id="form-qr-img" src="https://placehold.co/140x140/e0e7ff/312e81?text=Payment+QR" alt="Payment QR Code" class="w-32 h-32 object-contain mx-auto rounded-lg">
+                                <span class="text-[10px] text-slate-400 mt-1 block font-medium">Scan to Pay</span>
+                            </div>
+                        </div>
+
+                        <div class="pt-2 border-t border-indigo-100">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1">Upload Payment Receipt Screenshot *</label>
+                            <input type="file" id="app-screenshot-file" accept="image/*" required onchange="handleStudentScreenshotUpload(event)" class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-900 file:text-white hover:file:bg-indigo-800 cursor-pointer">
+                            <div id="screenshot-preview-container" class="mt-3 hidden">
+                                <span class="text-xs text-slate-500 block mb-1 font-medium">Attached Receipt Preview:</span>
+                                <img id="screenshot-preview-img" src="" alt="Receipt Preview" class="h-28 rounded-xl border border-slate-300 object-cover">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex items-center justify-end space-x-4 border-t border-slate-100">
+                        <button type="button" onclick="switchView('home')" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-700 font-medium text-sm hover:bg-slate-50 transition">Cancel</button>
+                        <button type="submit" class="bg-indigo-900 hover:bg-indigo-800 text-white px-8 py-3 rounded-xl font-semibold text-sm shadow transition">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- SUCCESS MODAL FOR APPLICATION -->
+        <div id="success-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center shadow-2xl fade-in">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">Application Submitted!</h3>
+                <p class="text-slate-600 text-sm mb-6">Your admission form and fee payment proof have been recorded successfully. Please save your Application ID.</p>
+                <div class="bg-slate-100 border border-slate-200 rounded-xl p-4 mb-6">
+                    <span class="text-xs text-slate-500 block uppercase tracking-wider mb-1">Your Application ID</span>
+                    <span id="modal-app-id" class="text-xl font-mono font-bold text-indigo-900"></span>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="copyAppId()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-3 rounded-xl text-sm transition">
+                        <i class="fa-regular fa-copy mr-1"></i> Copy ID
+                    </button>
+                    <button onclick="closeSuccessModal()" class="flex-1 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold py-3 rounded-xl text-sm transition">
+                        Track Now
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. TRACK APPLICATION STATUS VIEW -->
+        <section id="view-track" class="view-section hidden fade-in max-w-xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
+                <div class="text-center mb-8">
+                    <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 font-bold">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Track Admission Status</h2>
+                    <p class="text-slate-600 text-sm mt-1">Enter your Application ID or contact phone number below.</p>
+                </div>
+                <div class="flex gap-3 mb-8">
+                    <input type="text" id="track-id-input" placeholder="e.g., ADM-14892" class="flex-1 px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm font-mono">
+                    <button onclick="handleTrackSearch()" class="bg-indigo-900 hover:bg-indigo-800 text-white px-6 py-3 rounded-xl font-semibold text-sm transition shadow">Search</button>
+                </div>
+                <div id="track-result-container" class="hidden"></div>
+            </div>
+        </section>
+
+        <!-- 4. STUDY NOTES LIBRARY VIEW -->
+        <section id="view-notes" class="view-section hidden fade-in">
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 mb-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider bg-indigo-50 px-3 py-1 rounded-full">Resource Library</span>
+                        <h2 class="text-2xl font-extrabold text-slate-900 mt-2">Class Study Notes & Assignments</h2>
+                        <p class="text-slate-500 text-sm mt-1">Access lecture notes and homework published by school faculty.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <input type="text" id="notes-search" oninput="renderNotesLibrary()" placeholder="Search notes..." class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none w-48">
+                        <select id="notes-filter-class" onchange="renderNotesLibrary()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <option value="ALL">All Classes</option>
+                            <option value="Class 6">Class 6</option>
+                            <option value="Class 7">Class 7</option>
+                            <option value="Class 8">Class 8</option>
+                            <option value="Class 9">Class 9</option>
+                            <option value="Class 10">Class 10</option>
+                            <option value="Class 11">Class 11</option>
+                            <option value="Class 12">Class 12</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="notes-library-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="notes-library-empty" class="hidden py-16 text-center text-slate-400">
+                    <i class="fa-solid fa-book text-3xl mb-2"></i>
+                    <p class="text-sm">No study notes found.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ADMIN LOADING SEQUENCE -->
+        <section id="view-loading" class="view-section hidden fade-in max-w-md mx-auto py-16">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center">
+                <div class="inline-block p-4 bg-indigo-50 text-indigo-600 rounded-2xl text-3xl mb-6 animate-pulse">
+                    <i class="fa-solid fa-shield-cat"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">Admin Gateway Check</h3>
+                <p class="text-slate-500 text-sm mb-8">Verifying secure credentials...</p>
+                <div class="w-full bg-slate-100 rounded-full h-3 mb-6 overflow-hidden">
+                    <div id="loading-bar" class="bg-indigo-600 h-3 rounded-full transition-all duration-300 w-0"></div>
+                </div>
+                <div id="loading-step-text" class="text-lg font-mono font-bold text-indigo-900 mb-2">Connecting...</div>
+            </div>
+        </section>
+
+        <!-- 6. ADMIN LOGIN VIEW -->
+        <section id="view-admin-login" class="view-section hidden fade-in max-w-md mx-auto py-12">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-8">
+                <div class="text-center mb-8">
+                    <div class="w-14 h-14 bg-indigo-900 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900">Admin Portal Sign-In</h2>
+                    <p class="text-slate-500 text-sm mt-1">Authorized personnel only</p>
+                </div>
+
+                <div id="login-step-1" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Admin Username</label>
+                        <input type="text" id="admin-username-input" placeholder="mdrahen8544" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                    </div>
+                    <button type="button" onclick="handleAdminUsernameSubmit()" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-semibold py-3.5 rounded-xl text-sm transition shadow">
+                        Continue <i class="fa-solid fa-arrow-right ml-2 text-xs"></i>
+                    </button>
+                </div>
+
+                <div id="login-step-2" class="space-y-6 hidden">
+                    <div class="bg-indigo-50 p-3 rounded-xl flex items-center justify-between text-xs text-indigo-900 mb-4">
+                        <span id="display-logged-username" class="font-bold"></span>
+                        <button onclick="resetAdminLogin()" class="text-indigo-600 underline font-medium">Change</button>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">Admin Password</label>
+                        <input type="password" id="admin-password-input" placeholder="mdrahen" class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                    </div>
+                    <button type="button" onclick="handleAdminPasswordSubmit()" class="w-full bg-indigo-900 hover:bg-indigo-800 text-white font-semibold py-3.5 rounded-xl text-sm transition shadow">
+                        Sign In <i class="fa-solid fa-lock-open ml-2 text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. ADMIN DASHBOARD VIEW -->
+        <section id="view-admin-dashboard" class="view-section hidden fade-in">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">Secure Session Active</span>
+                    <h2 class="text-2xl font-extrabold text-slate-900 mt-2">Admin Control Dashboard</h2>
+                    <p class="text-slate-500 text-sm">Manage admissions, toggle status, upload images, and view revenue.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="openCmsModal()" class="bg-indigo-900 hover:bg-indigo-800 text-white font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center shadow">
+                        <i class="fa-solid fa-sliders mr-2"></i> CMS & Images Settings
+                    </button>
+                    <button onclick="openAnnouncementModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center">
+                        <i class="fa-solid fa-bullhorn mr-2"></i> Post Notice
+                    </button>
+                    <button onclick="handleAdminLogout()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-4 py-2.5 rounded-xl text-sm transition flex items-center">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Applications</span>
+                        <div class="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                    <div id="stat-total" class="text-3xl font-extrabold text-slate-900">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Pending Review</span>
+                        <div class="w-10 h-10 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                    </div>
+                    <div id="stat-pending" class="text-3xl font-extrabold text-slate-900">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Approved</span>
+                        <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div id="stat-accepted" class="text-3xl font-extrabold text-slate-900">0</div>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Total Revenue</span>
+                        <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div id="stat-revenue" class="text-3xl font-extrabold text-slate-900">$0</div>
+                </div>
+            </div>
+
+            <!-- Tabbed Tables -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden mb-12">
+                <div class="flex border-b border-slate-200 bg-slate-50 px-6 pt-4 gap-4">
+                    <button onclick="switchAdminTab('applications')" id="tab-btn-applications" class="pb-3 px-4 font-bold text-sm text-indigo-900 border-b-2 border-indigo-900 transition">Student Applications</button>
+                    <button onclick="switchAdminTab('notices')" id="tab-btn-notices" class="pb-3 px-4 font-bold text-sm text-slate-500 hover:text-slate-900 transition">Notices Manager</button>
+                </div>
+
+                <!-- Applications Table Tab -->
+                <div id="admin-tab-applications" class="p-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Applicants Management Directory</h3>
+                        <div class="flex items-center space-x-3">
+                            <input type="text" id="admin-search" oninput="renderAdminTable()" placeholder="Search name, ID..." class="px-4 py-2 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none w-64">
+                            <select id="admin-filter-status" onchange="renderAdminTable()" class="px-4 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <option value="ALL">All Status</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Accepted">Accepted</option>
+                                <option value="Rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider border-b border-slate-200">
+                                    <th class="py-4 px-6 font-semibold">App ID</th>
+                                    <th class="py-4 px-6 font-semibold">Student Name</th>
+                                    <th class="py-4 px-6 font-semibold">Class</th>
+                                    <th class="py-4 px-6 font-semibold">Guardian / Contact</th>
+                                    <th class="py-4 px-6 font-semibold">Txn ID</th>
+                                    <th class="py-4 px-6 font-semibold">Receipt</th>
+                                    <th class="py-4 px-6 font-semibold">Status</th>
+                                    <th class="py-4 px-6 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-table-body" class="divide-y divide-slate-100 text-sm text-slate-700"></tbody>
+                        </table>
+                    </div>
+                    <div id="admin-table-empty" class="hidden py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                        <p class="text-sm">No applications found.</p>
+                    </div>
+                </div>
+
+                <!-- Notices Tab -->
+                <div id="admin-tab-notices" class="p-6 hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-slate-900">Manage School Notices</h3>
+                        <button onclick="openAnnouncementModal()" class="bg-indigo-900 text-white px-4 py-2 rounded-xl text-xs font-semibold">Post Notice</button>
+                    </div>
+                    <div id="admin-announcements-list" class="space-y-3"></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL: CMS & SCHOOL IMAGE SETTINGS -->
+    <div id="cms-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl fade-in max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">CMS & School Images Settings</h3>
+            <p class="text-slate-500 text-sm mb-6">Toggle admissions, upload school hero images, and configure payment QR codes.</p>
+            <form onsubmit="handleCmsSubmit(event)" class="space-y-5">
+                
+                <!-- Admission Status Toggle -->
+                <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-200 space-y-3">
+                    <label class="block text-sm font-bold text-indigo-900">Admission Portal Status</label>
+                    <div class="flex items-center space-x-6">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="admission-toggle" id="toggle-open" value="OPEN" class="text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm font-semibold text-slate-800">Admission Open</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="admission-toggle" id="toggle-closed" value="CLOSED" class="text-indigo-600 focus:ring-indigo-500">
+                            <span class="text-sm font-semibold text-slate-800">Admission Closed</span>
+                        </label>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Closed Notice Message</label>
+                        <input type="text" id="cms-closed-msg" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">School Name</label>
+                    <input type="text" id="cms-school-name" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
+                </div>
+
+                <!-- Hero Image Upload / URL -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">School Hero Banner Image (Upload Image or URL)</label>
+                    <input type="file" id="cms-hero-file" accept="image/*" onchange="handleCmsHeroFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-indigo-900 file:text-white cursor-pointer mb-2">
+                    <input type="url" id="cms-hero-img" placeholder="Or paste image URL" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-xs">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Hero Title</label>
+                    <input type="text" id="cms-hero-title" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
+                </div>
+
+                <hr class="border-slate-200">
+
+                <!-- Payment QR Code Upload / URL -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Payment QR Code Image (Upload QR Image or URL)</label>
+                    <input type="file" id="cms-qr-file" accept="image/*" onchange="handleCmsQrFileUpload(event)" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-3 file:rounded-xl file:border-0 file:bg-indigo-900 file:text-white cursor-pointer mb-2">
+                    <input type="url" id="cms-qr-img" placeholder="Or paste QR image URL" class="w-full px-4 py-2 rounded-xl border border-slate-300 text-xs">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">UPI ID / Account</label>
+                        <input type="text" id="cms-upi" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Admission Fee ($)</label>
+                        <input type="text" id="cms-fee" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" onclick="closeCmsModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl text-sm transition">Cancel</button>
+                    <button type="submit" class="flex-1 bg-indigo-900 hover:bg-indigo-800 text-white font-semibold py-3 rounded-xl text-sm transition">Save Settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: PAYMENT RECEIPT SCREENSHOT LIGHTBOX -->
+    <div id="screenshot-modal" class="hidden fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl fade-in text-center">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Payment Receipt Screenshot</h3>
+            <p id="screenshot-modal-subtitle" class="text-xs text-slate-500 mb-4"></p>
+            <div class="bg-slate-100 p-2 rounded-2xl border border-slate-200 mb-6 flex items-center justify-center">
+                <img id="screenshot-modal-img" src="" alt="Receipt Proof" class="max-h-96 object-contain rounded-xl">
+            </div>
+            <button onclick="closeScreenshotModal()" class="bg-indigo-900 hover:bg-indigo-800 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition">Close Preview</button>
+        </div>
+    </div>
+
+    <!-- MODAL: POST NOTICE -->
+    <div id="announcement-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl fade-in">
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Post Public Notice</h3>
+            <p class="text-slate-500 text-sm mb-6">Instantly publish a notice on the public home page.</p>
+            <form onsubmit="handleAnnouncementSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Notice Title *</label>
+                    <input type="text" id="notice-title" required placeholder="e.g., Entrance Exam Date" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Details *</label>
+                    <textarea id="notice-content" required rows="3" placeholder="Enter notice details..." class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm"></textarea>
+                </div>
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" onclick="closeAnnouncementModal()" class="flex-1 bg-slate-100 py-3 rounded-xl text-sm font-semibold">Cancel</button>
+                    <button type="submit" class="flex-1 bg-indigo-900 text-white py-3 rounded-xl text-sm font-semibold">Publish</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-sm text-slate-500">
+            <p id="footer-school-copy">&copy; 2026 Springfield Academy. All rights reserved.</p>
+            <div class="flex space-x-6 mt-4 sm:mt-0">
+                <a href="#" class="hover:text-indigo-600 transition">Privacy Policy</a>
+                <a href="#" class="hover:text-indigo-600 transition" onclick="switchView('apply')">Admissions</a>
+                <a href="#" class="hover:text-indigo-600 transition" onclick="switchView('notes')">Study Notes</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core JavaScript Logic -->
+    <script>
+        // Default CMS Configuration
+        const defaultCms = {
+            schoolName: "Springfield Academy",
+            admissionStatus: "OPEN", // 'OPEN' or 'CLOSED'
+            closedMsg: "Admissions for the current academic year are currently closed. Please check back next semester.",
+            heroImg: "https://placehold.co/1200x600/1e1b4b/ffffff?text=Springfield+Academy+Campus",
+            heroTitle: "Shape Your Child's Future with Springfield",
+            qrImg: "https://placehold.co/140x140/e0e7ff/312e81?text=Scan+To+Pay+Fee",
+            upi: "springfield@upi",
+            fee: "50"
+        };
+
+        const defaultApplications = [
+            {
+                id: "ADM-10241",
+                name: "Ethan Smith",
+                studentClass: "Class 9",
+                guardian: "Sarah Smith",
+                contact: "+1 (555) 012-3456",
+                email: "sarah@example.com",
+                txn: "TXN84729183",
+                address: "742 Evergreen Terrace",
+                screenshot: "https://placehold.co/400x300/e2e8f0/475569?text=Receipt+Sample+1",
+                status: "Accepted",
+                feePaid: 50,
+                date: "2026-03-01"
+            },
+            {
+                id: "ADM-10242",
+                name: "Olivia Davis",
+                studentClass: "Class 11",
+                guardian: "Michael Davis",
+                contact: "+1 (555) 987-6543",
+                email: "michael@example.com",
+                txn: "TXN92837482",
+                address: "123 Maple Street",
+                screenshot: "https://placehold.co/400x300/e2e8f0/475569?text=Receipt+Sample+2",
+                status: "Pending",
+                feePaid: 50,
+                date: "2026-03-02"
+            }
+        ];
+
+        const defaultNotes = [
+            { id: 1, title: "Chapter 1: Quadratic Equations", studentClass: "Class 10", subject: "Mathematics", description: "Comprehensive notes covering discriminant rules and vertex calculations.", date: "2026-03-01" },
+            { id: 2, title: "Electromagnetic Induction Homework", studentClass: "Class 12", subject: "Physics", description: "Complete problems 1 through 15 on Faraday's law.", date: "2026-03-03" }
+        ];
+
+        const defaultAnnouncements = [
+            { id: 1, title: "Admission Open for Academic Year 2026-2027", content: "Applications are now live for classes 6 through 12.", date: "2026-03-01" }
+        ];
+
+        // Initialize LocalStorage safely
+        if (!localStorage.getItem('springfield_cms')) localStorage.setItem('springfield_cms', JSON.stringify(defaultCms));
+        if (!localStorage.getItem('springfield_applications')) localStorage.setItem('springfield_applications', JSON.stringify(defaultApplications));
+        if (!localStorage.getItem('springfield_notes')) localStorage.setItem('springfield_notes', JSON.stringify(defaultNotes));
+        if (!localStorage.getItem('springfield_announcements')) localStorage.setItem('springfield_announcements', JSON.stringify(defaultAnnouncements));
+
+        let currentAppIdJustCreated = "";
+        let studentScreenshotDataUrl = "";
+        let pendingHeroBase64 = "";
+        let pendingQrBase64 = "";
+        let pendingUsername = "";
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-900 text-emerald-100 border-emerald-700' : 'bg-rose-900 text-rose-100 border-rose-700';
+            toast.className = `px-5 py-3 rounded-2xl shadow-xl border text-sm font-medium flex items-center space-x-3 transition fade-in pointer-events-auto ${bgClass}`;
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-triangle-exclamation text-rose-400';
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // View Switcher
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`view-${viewId}`);
+            if (target) {
+                target.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            if (viewId === 'home') {
+                renderHomeCms();
+                renderPublicAnnouncements();
+            }
+            if (viewId === 'apply') {
+                checkAdmissionOpenState();
+                renderApplyPaymentInfo();
+            }
+            if (viewId === 'notes') {
+                renderNotesLibrary();
+            }
+            if (viewId === 'admin-dashboard') {
+                renderAdminTable();
+                renderAdminAnnouncements();
+                updateDashboardStats();
+            }
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // Check Admission Open / Closed State
+        function checkAdmissionOpenState() {
+            const cms = JSON.parse(localStorage.getItem('springfield_cms')) || defaultCms;
+            const closedNotice = document.getElementById('apply-closed-notice');
+            const formContainer = document.getElementById('apply-form-container');
+            const closedMsg = document.getElementById('apply-closed-msg');
+
+            if (cms.admissionStatus === 'CLOSED') {
+                closedNotice.classList.remove('hidden');
+                formContainer.classList.add('hidden');
+                if (closedMsg) closedMsg.innerText = cms.closedMsg;
+            } else {
+                closedNotice.classList.add('hidden');
+                formContainer.classList.remove('hidden');
+            }
+        }
+
+        // Render Home CMS & Admission Banner
+        function renderHomeCms() {
+            const cms = JSON.parse(localStorage.getItem('springfield_cms')) || defaultCms;
+            
+            document.getElementById('hero-bg-image').style.backgroundImage = `url('${cms.heroImg}')`;
+            document.getElementById('hero-title-text').innerText = cms.heroTitle;
+            document.getElementById('brand-school-title').innerText = cms.schoolName;
+            document.getElementById('footer-school-copy').innerHTML = `&copy; 2026 ${cms.schoolName}. All rights reserved.`;
+
+            const banner = document.getElementById('admission-status-banner');
+            const iconBox = document.getElementById('status-icon-box');
+            const titleEl = document.getElementById('admission-status-title');
+            const descEl = document.getElementById('admission-status-desc');
+            const actionContainer = document.getElementById('status-action-btn-container');
+
+            if (cms.admissionStatus === 'OPEN') {
+                banner.className = "mb-8 p-5 rounded-2xl shadow-sm border bg-emerald-50 border-emerald-200 text-emerald-900 flex flex-col sm:flex-row items-center justify-between gap-4";
+                iconBox.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold bg-emerald-200 text-emerald-800 flex-shrink-0";
+                iconBox.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+                titleEl.innerText = "Admissions Are Currently OPEN (Academic Year 2026-2027)";
+                descEl.innerText = "Applications are welcomed for Classes 6 through 12. Submit your online application today.";
+                actionContainer.innerHTML = `<button onclick="switchView('apply')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow transition">Apply Now</button>`;
+            } else {
+                banner.className = "mb-8 p-5 rounded-2xl shadow-sm border bg-rose-50 border-rose-200 text-rose-900 flex flex-col sm:flex-row items-center justify-between gap-4";
+                iconBox.className = "w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold bg-rose-200 text-rose-800 flex-shrink-0";
+                iconBox.innerHTML = `<i class="fa-solid fa-circle-xmark"></i>`;
+                titleEl.innerText = "Admissions Are Currently CLOSED";
+                descEl.innerText = cms.closedMsg;
+                actionContainer.innerHTML = `<button onclick="switchView('track')" class="bg-rose-700 hover:bg-rose-800 text-white font-semibold px-5 py-2.5 rounded-xl text-xs shadow transition">Track Application</button>`;
+            }
+        }
+
+        function renderApplyPaymentInfo() {
+            const cms = JSON.parse(localStorage.getItem('springfield_cms')) || defaultCms;
+            document.getElementById('form-qr-img').src = cms.qrImg;
+            document.getElementById('display-upi-id').innerText = cms.upi;
+            document.getElementById('display-fee-amount').innerText = `$${cms.fee}`;
+        }
+
+        // File Readers using Base64
+        function handleStudentScreenshotUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                studentScreenshotDataUrl = event.target.result;
+                const container = document.getElementById('screenshot-preview-container');
+                document.getElementById('screenshot-preview-img').src = studentScreenshotDataUrl;
+                container.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleCmsHeroFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                pendingHeroBase64 = event.target.result;
+                document.getElementById('cms-hero-img').value = pendingHeroBase64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleCmsQrFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                pendingQrBase64 = event.target.result;
+                document.getElementById('cms-qr-img').value = pendingQrBase64;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Render Public Announcements
+        function renderPublicAnnouncements() {
+            const container = document.getElementById('public-announcements-grid');
+            if (!container) return;
+            const announcements = JSON.parse(localStorage.getItem('springfield_announcements')) || [];
+            container.innerHTML = '';
+            if (announcements.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-sm italic">No active notices.</p>`;
+                return;
+            }
+            announcements.forEach(n => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-2xl shadow-sm border border-slate-200';
+                card.innerHTML = `
+                    <div class="text-xs text-indigo-600 font-semibold mb-2"><i class="fa-regular fa-calendar mr-1"></i> ${n.date}</div>
+                    <h4 class="text-base font-bold text-slate-900 mb-1">${n.title}</h4>
+                    <p class="text-slate-600 text-sm">${n.content}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Form Submit Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const cms = JSON.parse(localStorage.getItem('springfield_cms')) || defaultCms;
+            if (cms.admissionStatus === 'CLOSED') {
+                showToast("Admissions are currently closed.", "error");
+                return;
+            }
+
+            const name = document.getElementById('app-name').value.trim();
+            const studentClass = document.getElementById('app-class').value;
+            const guardian = document.getElementById('app-guardian').value.trim();
+            const contact = document.getElementById('app-contact').value.trim();
+            const email = document.getElementById('app-email').value.trim();
+            const txn = document.getElementById('app-txn').value.trim();
+            const address = document.getElementById('app-address').value.trim();
+
+            const randomId = 'ADM-' + Math.floor(10000 + Math.random() * 90000);
+
+            const newApp = {
+                id: randomId,
+                name,
+                studentClass,
+                guardian,
+                contact,
+                email,
+                txn,
+                address,
+                screenshot: studentScreenshotDataUrl || 'https://placehold.co/400x300/e2e8f0/475569?text=Receipt+Image',
+                status: 'Pending',
+                feePaid: parseFloat(cms.fee) || 50,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            const apps = JSON.parse(localStorage.getItem('springfield_applications')) || [];
+            apps.unshift(newApp);
+            localStorage.setItem('springfield_applications', JSON.stringify(apps));
+
+            currentAppIdJustCreated = randomId;
+            document.getElementById('modal-app-id').innerText = randomId;
+            document.getElementById('success-modal').classList.remove('hidden');
+            document.getElementById('admission-form').reset();
+            document.getElementById('screenshot-preview-container').classList.add('hidden');
+            studentScreenshotDataUrl = "";
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            switchView('track');
+            document.getElementById('track-id-input').value = currentAppIdJustCreated;
+            handleTrackSearch();
+        }
+
+        function copyAppId() {
+            const textArea = document.createElement("textarea");
+            textArea.value = currentAppIdJustCreated;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast("Application ID copied to clipboard!");
+            } catch (err) {
+                showToast("Failed to copy ID", "error");
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // Track Application Status
+        function handleTrackSearch() {
+            const query = document.getElementById('track-id-input').value.trim();
+            const container = document.getElementById('track-result-container');
+            if (!query) {
+                showToast("Please enter an Application ID or phone", "error");
+                return;
+            }
+
+            const apps = JSON.parse(localStorage.getItem('springfield_applications')) || [];
+            const found = apps.filter(a => a.id.toUpperCase() === query.toUpperCase() || a.contact.includes(query));
+
+            container.classList.remove('hidden');
+            if (found.length === 0) {
+                container.innerHTML = `<div class="bg-rose-50 border border-rose-200 text-rose-800 p-6 rounded-2xl text-center"><h4 class="font-bold">Not Found</h4><p class="text-xs mt-1">No application matching "${query}".</p></div>`;
+                return;
+            }
+
+            let html = '<div class="space-y-4">';
+            found.forEach(a => {
+                let badge = 'bg-amber-100 text-amber-800';
+                if (a.status === 'Accepted') badge = 'bg-emerald-100 text-emerald-800';
+                if (a.status === 'Rejected') badge = 'bg-rose-100 text-rose-800';
+
+                html += `
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 space-y-3">
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+                            <div>
+                                <span class="text-xs font-mono text-indigo-700">ID: ${a.id}</span>
+                                <h4 class="font-bold text-lg text-slate-900">${a.name}</h4>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${badge}">${a.status}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs text-slate-600">
+                            <div><strong>Class:</strong> ${a.studentClass}</div>
+                            <div><strong>Guardian:</strong> ${a.guardian}</div>
+                            <div><strong>Txn ID:</strong> ${a.txn}</div>
+                            <div><strong>Fee Paid:</strong> $${a.feePaid}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Study Notes Library
+        function renderNotesLibrary() {
+            const container = document.getElementById('notes-library-grid');
+            const emptyEl = document.getElementById('notes-library-empty');
+            if (!container) return;
+
+            const notes = JSON.parse(localStorage.getItem('springfield_notes')) || [];
+            const search = document.getElementById('notes-search').value.toLowerCase();
+            const filterClass = document.getElementById('notes-filter-class').value;
+
+            const filtered = notes.filter(n => {
+                const matchesSearch = n.title.toLowerCase().includes(search) || n.description.toLowerCase().includes(search);
+                const matchesClass = filterClass === 'ALL' || n.studentClass === filterClass;
+                return matchesSearch && matchesClass;
+            });
+
+            container.innerHTML = '';
+            if (filtered.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            filtered.forEach(note => {
+                const card = document.createElement('div');
+                card.className = 'bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between text-xs font-bold text-indigo-600 mb-2">
+                            <span class="bg-indigo-50 px-2.5 py-1 rounded-md">${note.studentClass}</span>
+                            <span class="text-slate-400 font-normal">${note.date}</span>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">${note.subject}</span>
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">${note.title}</h3>
+                        <p class="text-slate-600 text-sm mb-4">${note.description}</p>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Admin Security & Authentication Flow
+        function handleAdminNavClick() {
+            if (sessionStorage.getItem('springfield_admin_logged') === 'true') {
+                switchView('admin-dashboard');
+            } else {
+                startAdminLoadingSequence();
+            }
+        }
+
+        function startAdminLoadingSequence() {
+            switchView('loading');
+            const bar = document.getElementById('loading-bar');
+            const stepText = document.getElementById('loading-step-text');
+            bar.style.width = '25%';
+            stepText.innerText = 'Initializing cryptographic session...';
+
+            setTimeout(() => {
+                bar.style.width = '70%';
+                stepText.innerText = 'Verifying security tokens...';
+            }, 800);
+
+            setTimeout(() => {
+                bar.style.width = '100%';
+                stepText.innerText = 'Ready';
+                switchView('admin-login');
+                resetAdminLogin();
+            }, 1600);
+        }
+
+        function resetAdminLogin() {
+            document.getElementById('login-step-1').classList.remove('hidden');
+            document.getElementById('login-step-2').classList.add('hidden');
+            document.getElementById('admin-username-input').value = '';
+            document.getElementById('admin-password-input').value = '';
+            pendingUsername = "";
+        }
+
+        function handleAdminUsernameSubmit() {
+            const val = document.getElementById('admin-username-input').value.trim();
+            if (val !== 'mdrahen8544') {
+                showToast("Invalid admin username credential", "error");
+                return;
+            }
+            pendingUsername = val;
+            document.getElementById('display-logged-username').innerText = `User: ${val}`;
+            document.getElementById('login-step-1').classList.add('hidden');
+            document.getElementById('login-step-2').classList.remove('hidden');
+        }
+
+        function handleAdminPasswordSubmit() {
+            const val = document.getElementById('admin-password-input').value.trim();
+            if (val !== 'mdrahen') {
+                showToast("Invalid admin password credential", "error");
+                return;
+            }
+            sessionStorage.setItem('springfield_admin_logged', 'true');
+            showToast("Admin access authenticated successfully!");
+            switchView('admin-dashboard');
+        }
+
+        function handleAdminLogout() {
+            sessionStorage.removeItem('springfield_admin_logged');
+            showToast("Admin session ended.");
+            switchView('home');
+        }
+
+        // Admin Dashboard Tabs & Stats
+        function switchAdminTab(tabName) {
+            ['applications', 'notices'].forEach(t => {
+                document.getElementById(`admin-tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('border-b-2', 'border-indigo-900', 'text-indigo-900');
+                document.getElementById(`tab-btn-${t}`).classList.add('text-slate-500');
+            });
+            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('border-b-2', 'border-indigo-900', 'text-indigo-900');
+            document.getElementById(`tab-btn-${tabName}`).classList.remove('text-slate-500');
+        }
+
+        function updateDashboardStats() {
+            const apps = JSON.parse(localStorage.getItem('springfield_applications')) || [];
+            const total = apps.length;
+            const pending = apps.filter(a => a.status === 'Pending').length;
+            const accepted = apps.filter(a => a.status === 'Accepted').length;
+            const revenue = apps.reduce((acc, curr) => acc + (curr.feePaid || 50), 0);
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-accepted').innerText = accepted;
+            document.getElementById('stat-revenue').innerText = `$${revenue}`;
+        }
+
+        function renderAdminTable() {
+            const apps = JSON.parse(localStorage.getItem('springfield_applications')) || [];
+            const search = document.getElementById('admin-search').value.toLowerCase();
+            const filterStatus = document.getElementById('admin-filter-status').value;
+
+            updateDashboardStats();
+
+            const filtered = apps.filter(a => {
+                const matchesSearch = a.name.toLowerCase().includes(search) || a.id.toLowerCase().includes(search);
+                const matchesStatus = filterStatus === 'ALL' || a.status === filterStatus;
+                return matchesSearch && matchesStatus;
+            });
+
+            const tbody = document.getElementById('admin-table-body');
+            const emptyEl = document.getElementById('admin-table-empty');
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+            emptyEl.classList.add('hidden');
+
+            filtered.forEach(app => {
+                let badgeClass = 'bg-amber-100 text-amber-800';
+                if (app.status === 'Accepted') badgeClass = 'bg-emerald-100 text-emerald-800';
+                if (app.status === 'Rejected') badgeClass = 'bg-rose-100 text-rose-800';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition';
+                tr.innerHTML = `
+                    <td class="py-4 px-6 font-mono font-semibold text-indigo-900">${app.id}</td>
+                    <td class="py-4 px-6 font-semibold text-slate-900">${app.name}</td>
+                    <td class="py-4 px-6">${app.studentClass}</td>
+                    <td class="py-4 px-6">
+                        <div class="font-medium">${app.guardian}</div>
+                        <div class="text-xs text-slate-400">${app.contact}</div>
+                    </td>
+                    <td class="py-4 px-6 font-mono text-xs">${app.txn}</td>
+                    <td class="py-4 px-6">
+                        <button onclick="viewScreenshot('${app.screenshot}', '${app.name}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center">
+                            <i class="fa-solid fa-image mr-1"></i> View
+                        </button>
+                    </td>
+                    <td class="py-4 px-6"><span class="px-3 py-1 rounded-full text-xs font-bold ${badgeClass}">${app.status}</span></td>
+                    <td class="py-4 px-6 text-right space-x-1">
+                        <button onclick="updateStatus('${app.id}', 'Accepted')" class="bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg text-xs font-semibold">Approve</button>
+                        <button onclick="updateStatus('${app.id}', 'Rejected')" class="bg-rose-50 text-rose-700 px-3 py-1.5 rounded-lg text-xs font-semibold">Reject</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateStatus(id, newStatus) {
+            let apps = JSON.parse(localStorage.getItem('springfield_applications')) || [];
+            apps = apps.map(a => { if (a.id === id) a.status = newStatus; return a; });
+            localStorage.setItem('springfield_applications', JSON.stringify(apps));
+            renderAdminTable();
+            showToast(`Application ${id} status updated to ${newStatus}`);
+        }
+
+        function viewScreenshot(url, name) {
+            document.getElementById('screenshot-modal-img').src = url;
+            document.getElementById('screenshot-modal-subtitle').innerText = `Payment receipt for ${name}`;
+            document.getElementById('screenshot-modal').classList.remove('hidden');
+        }
+
+        function closeScreenshotModal() {
+            document.getElementById('screenshot-modal').classList.add('hidden');
+        }
+
+        // CMS Modal Controls
+        function openCmsModal() {
+            const cms = JSON.parse(localStorage.getItem('springfield_cms')) || defaultCms;
+            document.getElementById('cms-school-name').value = cms.schoolName;
+            document.getElementById('cms-hero-img').value = cms.heroImg;
+            document.getElementById('cms-hero-title').value = cms.heroTitle;
+            document.getElementById('cms-qr-img').value = cms.qrImg;
+            document.getElementById('cms-upi').value = cms.upi;
+            document.getElementById('cms-fee').value = cms.fee;
+            document.getElementById('cms-closed-msg').value = cms.closedMsg;
+
+            if (cms.admissionStatus === 'OPEN') {
+                document.getElementById('toggle-open').checked = true;
+            } else {
+                document.getElementById('toggle-closed').checked = true;
+            }
+            document.getElementById('cms-modal').classList.remove('hidden');
+        }
+
+        function closeCmsModal() {
+            document.getElementById('cms-modal').classList.add('hidden');
+        }
+
+        function handleCmsSubmit(e) {
+            e.preventDefault();
+            const statusVal = document.getElementById('toggle-open').checked ? 'OPEN' : 'CLOSED';
+            const heroVal = document.getElementById('cms-hero-img').value.trim() || pendingHeroBase64;
+            const qrVal = document.getElementById('cms-qr-img').value.trim() || pendingQrBase64;
+
+            const updated = {
+                admissionStatus: statusVal,
+                closedMsg: document.getElementById('cms-closed-msg').value.trim(),
+                schoolName: document.getElementById('cms-school-name').value.trim(),
+                heroImg: heroVal,
+                heroTitle: document.getElementById('cms-hero-title').value.trim(),
+                qrImg: qrVal,
+                upi: document.getElementById('cms-upi').value.trim(),
+                fee: document.getElementById('cms-fee').value.trim()
+            };
+
+            localStorage.setItem('springfield_cms', JSON.stringify(updated));
+            closeCmsModal();
+            showToast("CMS & School settings saved successfully!");
+            renderHomeCms();
+        }
+
+        // Notices Manager
+        function openAnnouncementModal() {
+            document.getElementById('announcement-modal').classList.remove('hidden');
+        }
+
+        function closeAnnouncementModal() {
+            document.getElementById('announcement-modal').classList.add('hidden');
+        }
+
+        function handleAnnouncementSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('notice-title').value.trim();
+            const content = document.getElementById('notice-content').value.trim();
+            const announcements = JSON.parse(localStorage.getItem('springfield_announcements')) || [];
+            announcements.unshift({ id: Date.now(), title, content, date: new Date().toISOString().split('T')[0] });
+            localStorage.setItem('springfield_announcements', JSON.stringify(announcements));
+            closeAnnouncementModal();
+            renderAdminAnnouncements();
+            showToast("Notice published successfully!");
+            e.target.reset();
+        }
+
+        function renderAdminAnnouncements() {
+            const container = document.getElementById('admin-announcements-list');
+            if (!container) return;
+            const announcements = JSON.parse(localStorage.getItem('springfield_announcements')) || [];
+            container.innerHTML = '';
+            announcements.forEach(n => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm';
+                item.innerHTML = `<div><div class="font-bold">${n.title}</div><div class="text-xs text-slate-500">${n.content}</div></div>`;
+                container.appendChild(item);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderHomeCms();
+            renderPublicAnnouncements();
+        });
+    </script>
+</body>
+</html>
